@@ -17,6 +17,7 @@ let chances;
 let timeLeft;
 let timerInterval;
 let gameObstacles;
+let bridges = new Set();
 let obstacleMap;
 
 const directions = ['up', 'right', 'down', 'left'];
@@ -97,48 +98,71 @@ function generateRandomPositions() {
         obstacles.add(`${obstaclePos.x},${obstaclePos.y}`);
     }
 
-    return { playerPos, flagPos, obstacles };
+
+    // Generar puentes (por ejemplo, 2 puentes)
+    const bridgeCount = 2;
+    for (let i = 0; i < bridgeCount; i++) {
+        let bridgePos;
+        do {
+            bridgePos = {
+                x: Math.floor(Math.random() * gridSize),
+                y: Math.floor(Math.random() * gridSize)
+            };
+        } while (positions.has(`${bridgePos.x},${bridgePos.y}`));
+        positions.add(`${bridgePos.x},${bridgePos.y}`);
+        bridges.add(`${bridgePos.x},${bridgePos.y}`);
+    }
+
+    return { playerPos, flagPos, obstacles, bridges };
+
 }
+
 
 function createGameBoard() {
     gameBoard.innerHTML = '';
-    gameBoard.style.gridTemplateColumns = `repeat(${gridSize}, 60px)`;
+    gameBoard.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
     
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
+            
             if (x === playerPosition.x && y === playerPosition.y) {
-                cell.textContent = '😎'; 
+                cell.classList.add('player-position');
+                cell.textContent = '😎';
             } else if (x === destinationPosition.x && y === destinationPosition.y) {
                 cell.textContent = '🏁';
             } else if (gameObstacles.has(`${x},${y}`)) {
                 cell.textContent = obstacleMap.get(`${x},${y}`);
+            } else if (bridges.has(`${x},${y}`)) {
+                cell.textContent = '🌉';
             }
+            
             gameBoard.appendChild(cell);
         }
     }
 }
 
-// function createGameBoard() {
-//     gameBoard.innerHTML = '';
-//     gameBoard.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+function goThroughBridge() {
+    let newPosition = { ...playerPosition };
+    switch (playerDirection) {
+        case 'up': newPosition.y--; break;
+        case 'right': newPosition.x++; break;
+        case 'down': newPosition.y++; break;
+        case 'left': newPosition.x--; break;
+    }
     
-//     for (let y = 0; y < gridSize; y++) {
-//         for (let x = 0; x < gridSize; x++) {
-//             const cell = document.createElement('div');
-//             cell.classList.add('cell');
-//             if (x === playerPosition.x && y === playerPosition.y) {
-//                 cell.textContent = '🚶';
-//             } else if (x === destinationPosition.x && y === destinationPosition.y) {
-//                 cell.textContent = '🏁';
-//             } else if (gameObstacles.has(`${x},${y}`)) {
-//                 cell.textContent = obstacleMap.get(`${x},${y}`);
-//             }
-//             gameBoard.appendChild(cell);
-//         }
-//     }
-// }
+    if (bridges.has(`${newPosition.x},${newPosition.y}`)) {
+        playerPosition = newPosition;
+        updatePlayerPosition();
+        return "You crossed the bridge!";
+    } else {
+        return "There's no bridge to cross here.";
+    }
+}
+
+
 
 function updateDirectionIndicator() {
     const arrowContainer = document.getElementById('arrow-container');
@@ -214,7 +238,9 @@ function isValidPosition(position) {
 }
 
 function isValidMove(position) {
-    return isValidPosition(position) && !gameObstacles.has(`${position.x},${position.y}`);
+    return isValidPosition(position) && 
+           (!gameObstacles.has(`${position.x},${position.y}`) || 
+            bridges.has(`${position.x},${position.y}`));
 }
 
 function checkWinCondition() {
@@ -227,7 +253,13 @@ function processCommand(command) {
     const lowerCommand = command.toLowerCase().trim();
     const parts = lowerCommand.split(' ');
     
-    if (parts[0] === 'go' || parts[0] === 'move') {
+    if (parts[0] === 'go' || parts[0] === 'move' || parts[0] === 'keep') {
+        if (parts[1] === 'through') {
+            return goThroughBridge();
+        }
+        if (parts[0] === 'keep' && parts[1] === 'going' && parts[2] === 'on') {
+            return moveForward(1);
+        }
         const steps = parts.length > 2 ? parseInt(parts[1]) : 1;
         if (parts[parts.length - 1] === 'forward' || parts[parts.length - 1] === 'straight') {
             return moveForward(steps);
@@ -241,8 +273,9 @@ function processCommand(command) {
     }
     
     decreaseChances();
-    return 'Invalid command. Try "go forward", "go back", "turn left", or "turn right". You lost a chance!';
+    return 'Invalid command. Try "go forward", "go back", "keep going on", "turn left", "turn right", or "go through" (for bridges). You lost a chance!';
 }
+
 
 function decreaseChances() {
     chances--;
@@ -262,22 +295,6 @@ function startTimer() {
         }
     }, 1000);
 }
-
-// function endGame(win) {
-//     clearInterval(timerInterval);
-//     commandInput.disabled = true;
-//     submitCommand.disabled = true;
-//     if (win) {
-//         messageDiv.textContent = 'Congratulations! You reached the destination!';
-//     } else {
-//         if (chances <= 0) {
-//             messageDiv.textContent = 'Game over! You ran out of chances. Try again!';
-//         } else if (timeLeft <= 0) {
-//             messageDiv.textContent = 'Game over! You ran out of time. Try again!';
-//         }
-//     }
-//     playAgainButton.style.display = 'block';
-// }
 
 function endGame(win) {
     clearInterval(timerInterval);
@@ -306,6 +323,7 @@ function initializeGame() {
     playerPosition = playerPos;
     destinationPosition = flagPos;
     gameObstacles = obstacles;
+    bridges = bridges;
     
     obstacleMap = new Map();
     gameObstacles.forEach(obstacle => {
