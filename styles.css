@@ -1,184 +1,42 @@
-/* body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f0f0f0;
-}
-
-#game-container {
-    text-align: center;
-}
-
-#game-board {
-    display: inline-grid;
-    grid-template-columns: repeat(5, 60px);
-    grid-gap: 1px;
-    background-color: #ccc;
-    border: 1px solid #999;
-    margin-bottom: 20px;
-}
-
-/* .cell {
-    width: 60px;
-    height: 60px;
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-} */
-
-#instructions {
-    margin-bottom: 20px;
-}
-
-#controls button {
-    margin: 0 5px;
-    padding: 10px;
-    font-size: 16px;
-}
-
-
-#command-input {
-    width: 200px;
-    padding: 5px;
-    font-size: 16px;
-}
-
-#submit-command {
-    padding: 5px 10px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-} */
-
-/* #message {
-    margin-top: 10px;
-    font-weight: bold;
-} */
-
-
-/* 
-#game-info {
-    margin-top: 20px;
-    font-size: 18px;
-}
-
-#game-info p {
-    margin: 5px 0;
-}
-
-
-
-#difficulty-select, #start-game {
-    margin: 10px;
-    padding: 5px;
-    font-size: 16px;
-}
-
-#start-game {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-
-
-#message {
-    margin-top: 10px;
-    padding: 10px;
-    font-weight: bold;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-
-.cell {
-    width: 60px;
-    height: 60px;
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    overflow: hidden;
-}
-
-
-
-#game-area {
-    display: flex;
-    align-items: flex-start;
-}
-
-#direction-indicator {
-    margin-left: 20px;
-    text-align: center;
-}
-
-#arrow-container {
-    font-size: 48px;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-#play-again {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    display: none;
-} */
-
-
-
-
 body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
 }
 
 #game-container {
     text-align: center;
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 #game-board {
-    display: inline-grid;
+    display: grid;
     grid-gap: 1px;
     background-color: #ccc;
     border: 1px solid #999;
-    margin-bottom: 20px;
+    margin: 0 auto 20px;
+    width: 90vw;
+    height: 90vw;
+    max-width: 500px;
+    max-height: 500px;
 }
 
 .cell {
-    width: 60px;
-    height: 60px;
     background-color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 24px;
     overflow: hidden;
+    border: 1px solid #ccc;
+    aspect-ratio: 1 / 1;
 }
 
 #instructions {
@@ -235,37 +93,30 @@ body {
 
 #game-area {
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
 }
 
 #direction-indicator {
-    margin-left: 20px;
+    margin-top: 10px;
     text-align: center;
 }
 
+#direction-indicator p {
+    margin: 0 0 5px 0;
+}
+
 #arrow-container {
-    font-size: 48px;
-    width: 60px;
-    height: 60px;
+    font-size: 36px;
+    width: 50px;
+    height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
-
-#play-again {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    display: none;
-}
-
 
 #play-again {
     display: none;
@@ -280,4 +131,30 @@ body {
 
 #controls {
     margin-top: 20px;
+}
+
+@media (min-width: 768px) {
+    #game-board {
+        width: 500px;
+        height: 500px;
+    }
+
+    #game-area {
+        flex-direction: row;
+    }
+
+    #direction-indicator {
+        margin-left: 20px;
+        margin-top: 0;
+    }
+
+    #arrow-container {
+        font-size: 48px;
+        width: 60px;
+        height: 60px;
+    }
+}
+
+.cell.bridge {
+    background-color: #87CEFA; /* Un color azul claro para representar el puente */
 }
