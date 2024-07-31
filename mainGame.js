@@ -109,7 +109,7 @@ function createGameBoard() {
             const cell = document.createElement('div');
             cell.classList.add('cell');
             if (x === playerPosition.x && y === playerPosition.y) {
-                cell.textContent = '😎';
+                cell.textContent = '😎'; 
             } else if (x === destinationPosition.x && y === destinationPosition.y) {
                 cell.textContent = '🏁';
             } else if (gameObstacles.has(`${x},${y}`)) {
